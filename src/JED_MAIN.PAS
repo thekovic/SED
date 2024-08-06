@@ -1708,23 +1708,22 @@ begin
     AddKBItem(miMap, 'Back view', '5', []);
     AddKBItem(miMap, 'Right view', '6', []);
 
-    AddKBItem(miMap, 'Move'#9'Shift+Middle Mouse Button', #0, []);
-    AddKBItem(miMap, 'Move left', Char(VK_RIGHT), []);
-    AddKBItem(miMap, 'Move right', Char(VK_LEFT), []);
-    AddKBItem(miMap, 'Move Down', Char(VK_UP), []);
+    AddKBItem(miMap, 'Move'#9'Right Mouse Button', #0, []);
     AddKBItem(miMap, 'Move Up', Char(VK_Down), []);
+    AddKBItem(miMap, 'Move Down', Char(VK_UP), []);
+    AddKBItem(miMap, 'Move Left', Char(VK_RIGHT), []);
+    AddKBItem(miMap, 'Move Right', Char(VK_LEFT), []);
     AddKBItem(miMap, 'Move forward', Char(VK_NEXT), []);
     AddKBItem(miMap, 'Move back', Char(VK_PRIOR), []);
 
-    AddKBItem(miMap, 'Rotate'#9'Middle Mouse Button', #0, []);
-    AddKBItem(miMap, 'Rotate in X direction'#9'Ctrl+Middle Mouse Button', #0, []);
-    AddKBItem(miMap, 'Rotate in Y direction'#9'Ctrl+Shift+Middle Mouse Button', #0, []);
-    AddKBItem(miMap, 'Rotate right', Char(VK_RIGHT), [ssShift]);
-    AddKBItem(miMap, 'Rotate left', Char(VK_LEFT), [ssShift]);
+    AddKBItem(miMap, 'Rotate'#9'Shift+Right Mouse Button', #0, []);
+    AddKBItem(miMap, 'Rotate in X direction'#9'Shift+Ctrl+Right Mouse Button', #0, []);
+    AddKBItem(miMap, 'Rotate in Y direction'#9'Shift+Alt+Right Mouse Button', #0, []);
     AddKBItem(miMap, 'Rotate Up', Char(VK_UP), [ssShift]);
     AddKBItem(miMap, 'Rotate Down', Char(VK_DOWN), [ssShift]);
-    AddKBItem(miMap, 'Rotate ...', Char(VK_NEXT), [ssShift]);
-    AddKBItem(miMap, 'Rotate ...', Char(VK_PRIOR), [ssShift]);
+    AddKBItem(miMap, 'Rotate Right', Char(VK_RIGHT), [ssShift]);
+    AddKBItem(miMap, 'Rotate Left', Char(VK_LEFT), [ssShift]);
+
     AddKBItem(miMap, 'Zoom at cursor'#9'Mouse Wheel', #0, []);
     AddKBItem(miMap, 'Zoom at cursor', 'C', [ssShift]);
     AddKBItem(miMap, 'Zoom in', Char(VK_ADD), []);
@@ -1739,7 +1738,6 @@ begin
     AddKBItem(miGrid, 'Right view&&grid', '6', [ssShift]);
 
     AddKBItem(miGrid, 'Snap grid to item', 'S', [ssShift]);
-    AddKBItem(miGrid, 'Snap grid to item', 'W', [ssShift]);
     AddKBItem(miGrid, 'Move Grid'#9'G+Mouse', #0, []);
     AddKBItem(miGrid, 'Swap Grid axis', 'G', [ssShift]);
 
@@ -1788,7 +1786,7 @@ begin
 
     AddKBItem(miEdit, 'Move item'#9'Ctrl+Left Mouse Button', #0, []);
     AddKBItem(miEdit, 'Start cleave', 'C', []);
-    AddKBItem(miEdit, 'Cleave by grid', 'C', [ssAlt]);
+    AddKBItem(miEdit, 'Cleave by grid', 'C', [ssShift]);
     AddKBItem(miEdit, 'Assign Thing to Sector', 'A', [ssShift]);
     AddKBItem(miEdit, 'Unadjoin', 'A', [ssAlt]);
     AddKBItem(miEdit, 'Adjoin', 'A', []);
@@ -2098,6 +2096,10 @@ begin
                 NextObjectInSurface;
             Ord('P'):
                 PreviousObjectInSurface;
+            Ord('C'):
+                { Cleave by grid plane }
+                With renderer do
+                    CleaveBy(gnormal, GridX, GridY, GridZ);
             Ord('T'):
                 SetMapMode(MM_FR);
             Ord('G'):
@@ -2140,17 +2142,13 @@ begin
                 if MapRot = MR_old then
                   begin
                       case Key of
-                          VK_RIGHT:
-                              rYaw := rYaw - 5;
-                          VK_LEFT:
-                              rYaw := rYaw + 5;
                           VK_UP:
                               rPch := rPch - 5;
                           VK_DOWN:
                               rPch := rPch + 5;
-                          VK_PRIOR:
+                          VK_RIGHT:
                               rRol := rRol - 5;
-                          VK_NEXT:
+                          VK_LEFT:
                               rRol := rRol + 5;
                       end;
                       SetRendFromPYR;
@@ -2219,7 +2217,7 @@ begin
                     LayerThings;
             Ord('F'):
                 Goto_Adjoin;
-            Ord('S'), Ord('W'):
+            Ord('S'):
                 SnapGridToObject;
         else
             exit;
@@ -2298,10 +2296,6 @@ begin
                             end;
                         end;
                 end;
-            Ord('C'):
-                { Cleave by grid plane }
-                With renderer do
-                    CleaveBy(gnormal, GridX, GridY, GridZ);
             Ord('I'):
                 if mapMode = MM_SF then
                 begin
@@ -2657,10 +2651,6 @@ begin
             end;
         VK_SPACE:
             DO_MultiSelect;
-        { if GetMousePos(X,Y) then begin SetMouseMode(MM_TranslateCam); Do_StartTranslateCam(X,Y); end; }
-        Ord('R'):
-            if GetMousePos(X, Y) then
-                Do_StartRotateCam(X, Y);
         Ord('T'):
             SetMapMode(MM_TH);
         Ord('V'):
@@ -4017,11 +4007,11 @@ begin
             MM_Ruler:
                 Do_StartRuler(X, Y, ssShift in Shift);
         end;
-      TMouseButton.mbRight: ;
-      TMouseButton.mbMiddle:
+      TMouseButton.mbMiddle: ;
+      TMouseButton.mbRight:
         if GetMousePos(X, Y) then
           begin
-            if [ssShift, ssMiddle] = Shift then
+            if [ssRight] = Shift then
               Do_StartTranslateCam(X, Y)
             else
               Do_StartRotateCam(X, Y);
@@ -4052,8 +4042,8 @@ begin
                 MM_RectSelect:
                     DO_EndRectSelect(X, Y);
             end;
-        TMouseButton.mbRight: ;
-        TMouseButton.mbMiddle: SetMouseMode(MM_Select);
+        TMouseButton.mbMiddle: ;
+        TMouseButton.mbRight: SetMouseMode(MM_Select);
     end;
 end;
 
@@ -4145,7 +4135,7 @@ begin
             Do_TranslateCam(X, Y);
         MM_RotateCam:
           begin
-            if (ssShift in Shift) and (ssCtrl in Shift) then
+            if ssAlt in Shift then
               X := gridTranslateOrg2.X
             else if ssCtrl in Shift then
               Y := gridTranslateOrg2.Y;
