@@ -1708,7 +1708,7 @@ begin
     AddKBItem(miMap, 'Back view', '5', []);
     AddKBItem(miMap, 'Right view', '6', []);
 
-    AddKBItem(miMap, 'Move'#9'Shift+Middle Mouse Button', #0, []);
+    AddKBItem(miMap, 'Move'#9'Right Mouse Button', #0, []);
     AddKBItem(miMap, 'Move Up', Char(VK_Down), []);
     AddKBItem(miMap, 'Move Down', Char(VK_UP), []);
     AddKBItem(miMap, 'Move Left', Char(VK_RIGHT), []);
@@ -1716,15 +1716,13 @@ begin
     AddKBItem(miMap, 'Move forward', Char(VK_NEXT), []);
     AddKBItem(miMap, 'Move back', Char(VK_PRIOR), []);
 
-    AddKBItem(miMap, 'Rotate'#9'Middle Mouse Button', #0, []);
-    AddKBItem(miMap, 'Rotate in X direction'#9'Ctrl+Middle Mouse Button', #0, []);
-    AddKBItem(miMap, 'Rotate in Y direction'#9'Ctrl+Shift+Middle Mouse Button', #0, []);
+    AddKBItem(miMap, 'Rotate'#9'Shift+Right Mouse Button', #0, []);
+    AddKBItem(miMap, 'Rotate in X direction'#9'Shift+Ctrl+Right Mouse Button', #0, []);
+    AddKBItem(miMap, 'Rotate in Y direction'#9'Shift+Alt+Right Mouse Button', #0, []);
     AddKBItem(miMap, 'Rotate Up', Char(VK_UP), [ssShift]);
     AddKBItem(miMap, 'Rotate Down', Char(VK_DOWN), [ssShift]);
-    AddKBItem(miMap, 'Rotate Left', Char(VK_LEFT), [ssShift]);
     AddKBItem(miMap, 'Rotate Right', Char(VK_RIGHT), [ssShift]);
-    AddKBItem(miMap, 'Rotate ...', Char(VK_NEXT), [ssShift]);
-    AddKBItem(miMap, 'Rotate ...', Char(VK_PRIOR), [ssShift]);
+    AddKBItem(miMap, 'Rotate Left', Char(VK_LEFT), [ssShift]);
 
     AddKBItem(miMap, 'Zoom at cursor'#9'Mouse Wheel', #0, []);
     AddKBItem(miMap, 'Zoom in', Char(VK_ADD), []);
@@ -2142,17 +2140,13 @@ begin
                 if MapRot = MR_old then
                   begin
                       case Key of
-                          VK_RIGHT:
-                              rYaw := rYaw - 5;
-                          VK_LEFT:
-                              rYaw := rYaw + 5;
                           VK_UP:
                               rPch := rPch - 5;
                           VK_DOWN:
                               rPch := rPch + 5;
-                          VK_PRIOR:
+                          VK_RIGHT:
                               rRol := rRol - 5;
-                          VK_NEXT:
+                          VK_LEFT:
                               rRol := rRol + 5;
                       end;
                       SetRendFromPYR;
@@ -2653,10 +2647,6 @@ begin
             end;
         VK_SPACE:
             DO_MultiSelect;
-        { if GetMousePos(X,Y) then begin SetMouseMode(MM_TranslateCam); Do_StartTranslateCam(X,Y); end; }
-        Ord('R'):
-            if GetMousePos(X, Y) then
-                Do_StartRotateCam(X, Y);
         Ord('T'):
             SetMapMode(MM_TH);
         Ord('V'):
@@ -4013,11 +4003,11 @@ begin
             MM_Ruler:
                 Do_StartRuler(X, Y, ssShift in Shift);
         end;
-      TMouseButton.mbRight: ;
-      TMouseButton.mbMiddle:
+      TMouseButton.mbMiddle: ;
+      TMouseButton.mbRight:
         if GetMousePos(X, Y) then
           begin
-            if [ssShift, ssMiddle] = Shift then
+            if [ssRight] = Shift then
               Do_StartTranslateCam(X, Y)
             else
               Do_StartRotateCam(X, Y);
@@ -4048,8 +4038,8 @@ begin
                 MM_RectSelect:
                     DO_EndRectSelect(X, Y);
             end;
-        TMouseButton.mbRight: ;
-        TMouseButton.mbMiddle: SetMouseMode(MM_Select);
+        TMouseButton.mbMiddle: ;
+        TMouseButton.mbRight: SetMouseMode(MM_Select);
     end;
 end;
 
@@ -4141,7 +4131,7 @@ begin
             Do_TranslateCam(X, Y);
         MM_RotateCam:
           begin
-            if (ssShift in Shift) and (ssCtrl in Shift) then
+            if ssAlt in Shift then
               X := gridTranslateOrg2.X
             else if ssCtrl in Shift then
               Y := gridTranslateOrg2.Y;
